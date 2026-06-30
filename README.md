@@ -60,7 +60,7 @@ A API utiliza **JWT (JSON Web Token)** para autenticação.
 - senha: 123456
 
 ### 👤 Usuário comum
-- email: selm@teste.com
+- email: selm@gmail.com
 - senha: 123456
 
 ## 🌐 Deploy
