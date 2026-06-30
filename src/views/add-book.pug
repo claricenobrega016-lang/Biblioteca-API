@@ -1,0 +1,126 @@
+extends layouts/main.pug
+
+block content
+  //- Navbar
+  nav.navbar(style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 2rem; background: var(--card-bg, #ffffff); border-bottom: 1px solid var(--border-light, #e5e7eb); position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.05));")
+    .logo(style="font-size: 1.25rem; font-weight: 700; color: var(--text-dark, #1f2937); letter-spacing: -0.025em; display: flex; align-items: center; gap: 0.5rem;") 
+      span 📚
+      | Biblioteca API
+      span(style="font-size: 0.75rem; font-weight: 400; background: #e0e7ff; color: #4338ca; padding: 0.15rem 0.5rem; border-radius: 50px; margin-left: 0.25rem;") Admin
+    
+    .menu(tabindex="0" style="position: relative; outline: none;")
+      button.menu-btn(
+        style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-main, #f3f4f6); color: var(--text-dark, #1f2937); padding: 0.6rem 1.1rem; border-radius: 50px; border: 1px solid var(--border-light, #e5e7eb); cursor: pointer; font-weight: 600; font-size: 0.85rem; font-family: inherit; transition: all 0.2s ease;"
+        onmouseover="this.style.background='#e2e8f0'; this.style.borderColor='#cbd5e1';"
+        onmouseout="this.style.background='var(--bg-main, #f3f4f6)'; this.style.borderColor='var(--border-light, #e5e7eb)';"
+      )
+        span(style="font-size: 1rem; line-height: 1;") ⚙️
+        | Opções
+        span(style="font-size: 0.65rem; opacity: 0.7; margin-left: 0.2rem;") ▼
+      
+      .dropdown(style="position: absolute; right: 0; top: calc(100% + 0.5rem); background: var(--card-bg, #ffffff); min-width: 180px; box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1)); border-radius: 12px; border: 1px solid var(--border-light, #e5e7eb); overflow: hidden; z-index: 1100; display: none;")
+        a(href="/dashboard", style="display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.25rem; color: var(--text-dark, #1f2937); font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: all 0.2s ease;")
+          span 📊
+          | Voltar ao Painel
+        a(href="/logout", style="display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.25rem; color: #dc2626; background: #fef2f2; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border-top: 1px solid var(--border-light, #e5e7eb);")
+          span 🚪 
+          | Sair
+
+  style.
+    .menu:focus-within .dropdown, .menu:hover .dropdown { display: block !important; }
+    .dropdown a:hover { background: var(--bg-main, #f3f4f6); color: #4338ca !important; }
+
+  .login-container
+    .login-card.register-card
+      .register-header
+        h1 Cadastrar Novo Livro
+        p.login-subtitle Insira as informações para atualizar o acervo da biblioteca
+
+      //- Elemento para exibir mensagens de sucesso ou erro 
+      #alertMessage.alert-message
+
+      form#addBookForm
+        //- Linha 1: Título do Livro
+        .form-group
+          label(for="titulo") Título do Livro
+          input(type="text", name="titulo", id="titulo", placeholder="Ex: O Senhor dos Anéis", required)
+
+        //- Linha 2: Autor e Categoria
+        .form-row
+          .form-group
+            label(for="autor") Autor
+            input(type="text", name="autor", id="autor", placeholder="Ex: J.R.R. Tolkien", required)
+
+          .form-group
+            label(for="categ") Categoria / Gênero
+            input(type="text", name="categ", id="categ", placeholder="Ex: Fantasia", required)
+
+        //- Linha 3: Ano de Publicação e Quantidades
+        .form-row
+          .form-group
+            label(for="anoPub") Ano de Lançamento
+            input(type="number", name="anoPub", id="anoPub", placeholder="Ex: 1954", min="0", max="2026", required)
+
+          .form-group
+            label(for="qtdDisponivel") Quantidade Disponível
+            input(type="number", name="qtdDisponivel", id="qtdDisponivel", placeholder="0", min="0", required)
+
+          .form-group
+            label(for="qtdTotal") Quantidade Total
+            input(type="number", name="qtdTotal", id="qtdTotal", placeholder="0", min="0", required)
+
+        
+        .form-group(style="margin-top: 2rem; display: flex; flex-direction: column; gap: 0.8rem;")
+          button.btn-cta(type="submit" id="btnSalvar" style="width: 100%; border: none; cursor: pointer;") Salvar Livro no Acervo 💾
+          a.btn-secondary(href="/dashboard" style="text-align: center; width: 100%; text-decoration: none;") Cancelar
+
+  script.
+    document.getElementById('addBookForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const alertBox = document.getElementById('alertMessage');
+      const btnSubmit = document.getElementById('btnSalvar');
+      
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      
+      data.anoPub = parseInt(data.anoPub, 10);
+      data.qtdDisponivel = parseInt(data.qtdDisponivel, 10);
+      data.qtdTotal = parseInt(data.qtdTotal, 10);
+
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = "Salvando Livro...";
+      alertBox.className = 'alert-message';
+
+      try {
+        const response = await fetch('/api/books', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          alertBox.classList.add('alert-success', 'show');
+          alertBox.innerText = 'Livro adicionado com sucesso! Redirecionando...';
+          
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 3000);
+          
+        } else {
+          const errData = await response.json();
+          alertBox.classList.add('alert-error', 'show');
+          alertBox.innerText = 'Erro: ' + (errData.message || 'Não foi possível salvar o livro.');
+          
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "Salvar Livro no Acervo 💾";
+        }
+      } catch (error) {
+        console.error('Erro na requisição:', error);
+        alertBox.className = 'alert-message alert-error show';
+        alertBox.innerText = 'Erro de conexão com o servidor.';
+        
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = "Salvar Livro no Acervo 💾";
+      }
+    });

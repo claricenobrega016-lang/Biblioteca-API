@@ -1,0 +1,236 @@
+extends layouts/main.pug
+
+block content
+  style.
+    :root {
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --card-bg: #ffffff;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    }
+
+    
+    .home-wrapper, .home-wrapper *, .navbar, .navbar * {
+      font-family: inherit !important;
+    }
+
+    /* Container principal */
+    .home-wrapper {
+      background: #f8fafc;
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 5%;
+      background: var(--card-bg);
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: var(--shadow-sm);
+    }
+    .navbar .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text-dark);
+    }
+    .navbar .btn-login {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+    .navbar .btn-login:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    /* Hero Section */
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 5% 2rem 5%;
+    }
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 4rem;
+      margin-bottom: 5rem;
+    }
+    @media (max-width: 768px) {
+      .hero { flex-direction: column; text-align: center; gap: 2rem; }
+    }
+    .hero-content {
+      flex: 1;
+    }
+    .hero-content h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+      margin: 0 0 1.25rem 0;
+      color: var(--text-dark);
+    }
+    .hero-content .lead {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #334155;
+      margin: 0 0 1rem 0;
+    }
+    .hero-content .hero-description {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin: 0 0 2rem 0;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    @media (max-width: 768px) { .hero-actions { justify-content: center; } }
+    
+    .hero-actions .btn-cta {
+      background: var(--primary-color);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.8rem 1.75rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+      transition: all 0.2s ease;
+    }
+    .hero-actions .btn-cta:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+    }
+    .hero-actions .btn-secondary {
+      background: #ffffff;
+      color: #334155;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.8rem 1.75rem;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      transition: all 0.2s ease;
+    }
+    .hero-actions .btn-secondary:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    
+    .hero-image {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+    .hero-image img {
+      width: 100%;
+      max-width: 480px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    /* Features Grid */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: #cbd5e1;
+    }
+    .feature-icon {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      color: var(--text-dark);
+    }
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid #e2e8f0;
+      background: var(--card-bg);
+    }
+
+  
+  .home-wrapper
+    //- Navbar Superior
+    nav.navbar
+      .logo 📚 Biblioteca API
+      a.btn-login(href="/login") Login
+
+    //- Conteúdo Principal 
+    main.hero-container
+      
+      //- Seção Principal
+      section.hero
+        .hero-content
+          h1 Gerencie sua Biblioteca de forma inteligente
+          p.lead Uma solução robusta e moderna para o controle de livros, autores e empréstimos em tempo real.
+          p.hero-description Perfeito para integração com aplicações web, sistemas acadêmicos e projetos de estudo. Desenvolvido com foco em performance e simplicidade.
+          
+          .hero-actions
+            a.btn-cta(href="/register") Começar Agora
+            a.btn-secondary(href="/login") Já tenho conta
+
+        .hero-image
+          img(src="/images/ft_biblioteca.jpg" alt="Biblioteca Digital")
+
+      //- Seção de Recursos
+      section.features
+        .feature-card
+          .feature-icon ⚡
+          h3 API Veloz
+          p Rotas otimizadas para listagem, cadastro e busca de livros instantaneamente.
+        
+        .feature-card
+          .feature-icon 🔒
+          h3 Controle Total
+          p Gerenciamento de níveis de acesso diferenciados para usuários comuns e administradores.
+        
+        .feature-card
+          .feature-icon 📊
+          h3 Métricas Reais
+          p Monitore a quantidade de livros disponíveis e o total em estoque facilmente.
+
+    //- Rodapé
+    footer.footer
+      p Sistema de Biblioteca © 2026

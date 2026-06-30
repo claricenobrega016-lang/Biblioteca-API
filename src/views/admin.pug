@@ -1,0 +1,283 @@
+extends layouts/main.pug
+
+block content
+  //- Navbar
+  nav.navbar(style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 2rem; background: var(--card-bg); border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow-sm);")
+    .logo(style="font-size: 1.25rem; font-weight: 700; color: var(--text-dark); letter-spacing: -0.025em; display: flex; align-items: center; gap: 0.5rem;") 📚 Biblioteca API
+    
+    //- Container do Menu Iterativo
+    .menu(tabindex="0" style="position: relative; outline: none;")
+      button.menu-btn(
+        style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-main); color: var(--text-dark); padding: 0.6rem 1.1rem; border-radius: 50px; border: 1px solid var(--border-light); cursor: pointer; font-weight: 600; font-size: 0.85rem; font-family: inherit; transition: all 0.2s ease;"
+        onmouseover="this.style.background='#e2e8f0'; this.style.borderColor='#cbd5e1';"
+        onmouseout="this.style.background='var(--bg-main)'; this.style.borderColor='var(--border-light)';"
+      )
+        span(style="font-size: 1rem; line-height: 1;") ⚙️
+        | Opções
+        span(style="font-size: 0.65rem; opacity: 0.7; margin-left: 0.2rem;") ▼
+
+      //- Menu Dropdown 
+      .dropdown(style="position: absolute; right: 0; top: calc(100% + 0.5rem); background: var(--card-bg); min-width: 180px; box-shadow: var(--shadow-lg); border-radius: 12px; border: 1px solid var(--border-light); overflow: hidden; z-index: 1100; display: none;")
+        a(href=`/edit-profile/${admin ? admin.id : ''}`, style="display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.25rem; color: var(--text-dark); font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: all 0.2s ease;")
+          span 👤
+          | Editar dados
+        a(href="/logout", style="display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.25rem; color: var(--danger-text); background: var(--danger-light); font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border-top: 1px solid var(--border-light);")
+          span 🚪
+          | Sair
+
+  style.
+    .menu:focus-within .dropdown, .menu:hover .dropdown { display: block !important; }
+    .dropdown a:hover { background: var(--bg-main); color: var(--primary-color) !important; }
+    .book-card { display: flex; flex-direction: column; }
+    .book-info { display: flex; flex-direction: column; flex-grow: 1; }
+
+  main.dashboard
+
+    //- TOPO DO ADMIN 
+    .header-admin(style="display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-light); padding-bottom: 1.5rem; flex-wrap: wrap;")
+      .header-title(style="flex: 1; min-width: 250px;")
+        h1(style="font-size: 2rem; font-weight: 700; color: var(--text-dark); margin: 0; letter-spacing: -0.02em;") Painel do Administrador
+        p.subtitle(style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;") Gerencie o acervo de livros e os usuários do sistema
+      
+      
+      a.btn-add-book(
+        href="/books/new", 
+        style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--primary-color); color: #fff; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); transition: all 0.2s ease-in-out; border: 1px solid transparent; white-space: nowrap;"
+        onmouseover="this.style.background='var(--primary-hover)'; this.style.transform='translateY(-1px)';"
+        onmouseout="this.style.background='var(--primary-color)'; this.style.transform='translateY(0)';"
+      ) ➕ Adicionar Novo Livro
+
+    
+    .admin-stats(style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 3.5rem;")
+      .stat-card(style="background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1.25rem; box-shadow: var(--shadow-sm);")
+        .stat-icon(style="font-size: 1.75rem; background: var(--bg-main); padding: 0.5rem; border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;") 📖
+        .stat-info(style="display: flex; flex-direction: column;")
+          span.stat-label(style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.02em;") Total de Livros
+          span#totalBooks.stat-value(style="font-size: 1.75rem; font-weight: 700; color: var(--text-dark); line-height: 1.2;")= books ? books.length : 0
+
+      .stat-card(style="background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1.25rem; box-shadow: var(--shadow-sm);")
+        .stat-icon(style="font-size: 1.75rem; background: var(--bg-main); padding: 0.5rem; border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;") 👥
+        .stat-info(style="display: flex; flex-direction: column;")
+          span.stat-label(style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.02em;") Usuários Cadastrados
+          span.stat-value(style="font-size: 1.75rem; font-weight: 700; color: var(--text-dark); line-height: 1.2;")= users ? users.length : 0
+
+    //- SEÇÃO: CONTROLE DE ACERVO (LIVROS)
+    section.admin-section
+      h2.section-title 📚 Controle de Acervo
+
+      #alertMessage.alert-message
+
+      if books && books.length > 0
+        .books-grid
+          each book in books
+            .book-card(data-book-id=book.id)
+              .book-img-container
+                img.book-img(src="/images/book.png", alt="Livro")
+
+              .book-info
+                span(style="font-size: 0.75rem; font-weight: 600; color: var(--primary-color); text-transform: uppercase;")= book.categ
+                h3= book.titulo
+
+                p
+                  strong Autor:
+                  span= book.autor
+
+                p
+                  strong Publicação:
+                  span= book.anoPub
+
+                //- Indicadores de Disponibilidade
+                .flex-availability(style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 0.5rem; border-top: 1px solid var(--border-light); font-size: 0.8rem;")
+                  span(style="color: var(--text-muted);") Disponibilidade:
+                  if book.qtdDisponivel > 0
+                    span.badge.badge-user #{book.qtdDisponivel} de #{book.qtdTotal}
+                  else
+                    span.badge(style="background-color: var(--danger-light); color: var(--danger-text);") Esgotado
+
+              //- Botões do Card 
+              .card-actions(style="display: flex; flex-direction: column; gap: 0.6rem; padding: 1.25rem; background: #f8fafc; border-top: 1px solid var(--border-light);")
+                div(style="display: flex; gap: 0.6rem; width: 100%;")
+                  a.btn-edit(href=`/edit-book/${book.id}`, style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.6rem; font-size: 0.85rem; font-weight: 600; border-radius: 8px; border: 1px solid var(--border-light); background: #fff; color: var(--text-dark); text-decoration: none; margin: 0; box-sizing: border-box; white-space: nowrap;") ✏️ Editar
+                  a.btn-loan(href=`/loan-create/${book.id}`, style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.6rem; font-size: 0.85rem; font-weight: 600; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.1); background: var(--success-light); color: var(--success-text); text-decoration: none; margin: 0; box-sizing: border-box; white-space: nowrap;") 📖 Emprestar
+                
+                form.form-delete-book(action=`/api/books/${book.id}`, style="width: 100%; margin: 0; padding: 0;")
+                  button.btn-delete(type="submit", style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.6rem; font-size: 0.85rem; font-weight: 600; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.1); background: var(--danger-light); color: var(--danger-text); cursor: pointer; font-family: inherit; margin: 0; box-sizing: border-box; white-space: nowrap;") 🗑️ Excluir Livro
+      else
+        .empty
+          p Nenhum livro cadastrado no sistema.
+
+    //- SEÇÃO: USUÁRIOS DO SISTEMA
+    section.admin-section
+      h2.section-title 👥 Usuários do Sistema
+
+      if users && users.length > 0
+        .table-container
+          table.admin-table
+            thead
+              tr
+                th Nome
+                th Email
+                th Função
+                th(style="width: 200px; text-align: center;") Ações
+
+            tbody
+              each user in users
+                tr
+                  td(style="font-weight: 500;")= user.nome
+                  td= user.email
+                  td
+                    if user.funcao === 'admin'
+                      span.badge.badge-admin Administrador
+                    else
+                      span.badge.badge-user Comum
+                  td
+                    .actions(style="display: flex; gap: 0.5rem; justify-content: center; align-items: center; width: 100%;")
+                      a.btn-edit(href=`/admin/edit-user/${user.id}`, style="display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.45rem 0.9rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--border-light); background: #fff; color: var(--text-dark); text-decoration: none; margin: 0;") ✏️ Editar
+                      button.btn-table-delete(onclick=`deleteUser('${user.id}', this)`, style="display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.45rem 0.9rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.1); background: var(--danger-light); color: var(--danger-text); cursor: pointer; font-family: inherit; margin: 0;") 🗑️ Excluir
+      else
+        .empty
+          p Nenhum usuário cadastrado além de você.
+
+    //- SEÇÃO: EMPRÉSTIMOS ATIVOS
+    section.admin-section
+      .section-header(style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;")
+        h2.section-title(style="margin: 0; display: flex; align-items: center; gap: 0.5rem;") 📖 Empréstimos Ativos
+        
+        a.btn-history(
+          href="/loans/history", 
+          style="display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.55rem 1.1rem; font-size: 0.85rem; font-weight: 600; border-radius: 8px; border: 1px solid var(--border-light); background: #fff; color: var(--text-dark); text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s ease; white-space: nowrap; margin: 0;"
+          onmouseover="this.style.background='#f8fafc'; this.style.borderColor='rgba(79, 70, 229, 0.3)'; this.style.transform='translateY(-1px)';"
+          onmouseout="this.style.background='#fff'; this.style.borderColor='var(--border-light)'; this.style.transform='translateY(0)';"
+        ) 📜 Ver Histórico
+
+      if loans && loans.length > 0
+        .table-container
+          table.admin-table
+            thead
+              tr
+                th Usuário
+                th Livro
+                th Empréstimo
+                th Limite
+                th Devolução
+                th Status
+                th(style="width: 150px; text-align: center;") Ações
+
+            tbody
+              each loan in loans
+                tr
+                  td(style="font-weight: 500;")= loan.user ? loan.user.nome : '—'
+                  td= loan.book ? loan.book.titulo : '—'
+                  td= loan.loanDate ? new Date(loan.loanDate).toLocaleDateString('pt-BR') : '—'
+                  td= loan.dueDate ? new Date(loan.dueDate).toLocaleDateString('pt-BR') : '—'
+                  td= loan.returnDate ? new Date(loan.returnDate).toLocaleDateString('pt-BR') : '—'
+                  td
+                    if loan.status === 'ATIVO'
+                      span.badge.badge-admin ATIVO
+                    else if loan.status === 'DEVOLVIDO'
+                      span.badge.badge-user DEVOLVIDO
+                    else
+                      span.badge(style="background-color: var(--danger-light); color: var(--danger-text);") ATRASADO
+                  td
+                    div(style="display: flex; justify-content: center; align-items: center; width: 100%;")
+                      if loan.status === 'ATIVO'
+                        button.btn-table-delete(onclick=`returnLoan('${loan.id}', this)`, style="display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.45rem 0.9rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.1); background: var(--success-light); color: var(--success-text); cursor: pointer; font-family: inherit; margin: 0;") 📦 Devolver
+                      else
+                        span(style="color: var(--text-muted); font-size: 0.85rem;") —
+      else
+        .empty
+          p Nenhum empréstimo ativo registrado.
+
+  footer.footer
+    p Sistema de Biblioteca © 2026
+
+  script.
+    async function deleteUser(id, el) {
+      const ok = confirm("Excluir usuário?");
+      if (!ok) return;
+
+      const res = await fetch(`/api/users/${id}`, {
+        method: "DELETE"
+      });
+
+      if (res.ok) {
+        el.closest("tr").remove();
+      } else {
+        alert("Erro ao deletar usuário");
+      }
+    }
+
+    async function returnLoan(id, el) {
+      const ok = confirm("Confirmar devolução do livro?");
+      if (!ok) return;
+
+      try {
+        const res = await fetch(`/api/loans/return/${id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (res.ok) {
+          window.location.href = "/dashboard";
+        } else {
+          const err = await res.json();
+          alert(err.message || "Erro ao devolver livro");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Erro de conexão");
+      }
+    }
+
+    document.querySelectorAll('.form-delete-book').forEach(form => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const certeza = confirm('Deseja mesmo excluir este livro do acervo?');
+        if (!certeza) return;
+
+        const alertBox = document.getElementById('alertMessage');
+        const urlDestino = e.target.action;
+        const cardLivro = e.target.closest('.book-card');
+
+        try {
+          const response = await fetch(urlDestino, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          });
+
+          if (response.ok) {
+            alertBox.className = 'alert-message alert-success show';
+            alertBox.innerText = 'Livro removido com sucesso!';
+
+            cardLivro.style.transition = 'all 0.4s ease';
+            cardLivro.style.opacity = '0';
+            cardLivro.style.transform = 'scale(0.9)';
+
+            setTimeout(() => {
+              cardLivro.remove();
+              const currentTotal = document.getElementById('totalBooks');
+              if (currentTotal) {
+                currentTotal.innerText = Math.max(0, parseInt(currentTotal.innerText, 10) - 1);
+              }
+            }, 400);
+
+            setTimeout(() => {
+              alertBox.classList.remove('show');
+            }, 3000);
+
+          } else {
+            const errData = await response.json();
+            alertBox.className = 'alert-message alert-error show';
+            alertBox.innerText = 'Erro: ' + (errData.message || 'Erro ao excluir.');
+          }
+
+        } catch (error) {
+          console.error(error);
+          alertBox.className = 'alert-message alert-error show';
+          alertBox.innerText = 'Erro de conexão.';
+        }
+      });
+    });

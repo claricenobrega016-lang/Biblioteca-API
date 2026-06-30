@@ -1,0 +1,159 @@
+extends layouts/main.pug
+
+block content
+  style.
+    .login-container {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 85vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    .login-card.register-card {
+      background: #ffffff;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 20px;
+      padding: 2.5rem 2.25rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 20px 25px -5px rgba(0, 0, 0, 0.02);
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #1e293b;
+      box-sizing: border-box;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: var(--primary-color, #4f46e5);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 0.4rem;
+      display: inline-block;
+    }
+
+  .login-container
+    .login-card.register-card
+      .register-header(style="text-align: center; margin-bottom: 1.75rem;")
+        h1(style="font-size: 1.85rem; font-weight: 700; color: #0f172a; margin: 0; letter-spacing: -0.03em;") Criar Conta
+        p.login-subtitle(style="color: #64748b; font-size: 0.9rem; margin-top: 0.4rem; font-weight: 400;") Crie sua conta para acessar a Biblioteca API
+
+      #alertMessage.alert-message
+
+      form#registerForm
+        .form-row
+          .form-group
+            label(for="nome") Nome completo
+            input(type="text", name="nome", id="nome", placeholder="Ex: João Silva", required)
+
+        .form-row
+          .form-group
+            label(for="email") Email
+            input(type="email", name="email", id="email", placeholder="exemplo@email.com", required)
+
+        .form-row
+          .form-group
+            label(for="telefone") Número de telefone
+            input(type="tel", name="telefone", id="telefone", placeholder="(81) 99999-9999", inputmode="numeric", autocomplete="tel", pattern="^\\(?\\d{2}\\)?\\s?9?\\d{4}-?\\d{4}$", required)
+            
+        .form-row
+          .form-group
+            label(for="senha") Senha
+            input(type="password", name="senha", id="senha", placeholder="Mínimo 6 caracteres", required)
+
+        button(
+          type="submit" 
+          id="btnCadastrar"
+          style="width: 100%; display: inline-flex; align-items: center; justify-content: center; background: var(--primary-color, #4f46e5); color: #ffffff; padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 600; font-size: 0.95rem; border: 1px solid transparent; cursor: pointer; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15); transition: all 0.2s ease; font-family: inherit; margin-top: 0.5rem;"
+          onmouseover="this.style.background='var(--primary-hover, #4338ca)'; this.style.transform='translateY(-1px)';"
+          onmouseout="this.style.background='var(--primary-color, #4f46e5)'; this.style.transform='translateY(0)';"
+        ) Cadastrar
+
+      p.login-footer(style="text-align: center; margin-top: 1.75rem; padding-top: 1.25rem; font-size: 0.85rem; color: #64748b; border-top: 1px solid #e2e8f0;")
+        span Já tem uma conta? 
+        a(href="/login", style="color: var(--primary-color, #4f46e5); font-weight: 600; text-decoration: none;", onmouseover="this.style.color='var(--primary-hover, #4338ca)'; this.style.textDecoration='underline';", onmouseout="this.style.color='var(--primary-color, #4f46e5)'; this.style.textDecoration='none';") Entrar
+
+  script.
+    document.addEventListener('DOMContentLoaded', () => {
+      const telefoneInput = document.getElementById('telefone');
+
+      telefoneInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+
+        if (value.length > 11) value = value.slice(0, 11);
+
+        if (value.length > 10) {
+          value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+        } else if (value.length > 6) {
+          value = value.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3');
+        } else if (value.length > 2) {
+          value = value.replace(/(\d{2})(\d+)/, '($1) $2');
+        } else if (value.length > 0) {
+          value = value.replace(/(\d+)/, '($1');
+        }
+
+        e.target.value = value;
+      });
+
+      document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const alertBox = document.getElementById('alertMessage');
+        const btnSubmit = document.getElementById('btnCadastrar');
+
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Cadastrando...";
+
+        alertBox.className = 'alert-message';
+
+        try {
+          const response = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+
+          if (response.ok) {
+            alertBox.classList.add('alert-success', 'show');
+            alertBox.innerText = 'Conta criada com sucesso! Redirecionando...';
+
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 3000);
+
+          } else {
+            const errData = await response.json();
+
+            alertBox.classList.add('alert-error', 'show');
+            alertBox.innerText = 'Erro: ' + (errData.message || 'Não foi possível cadastrar.');
+
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Cadastrar";
+          }
+
+        } catch (error) {
+          console.error('Erro na requisição:', error);
+          alertBox.className = 'alert-message alert-error show';
+          alertBox.innerText = 'Erro de conexão com o servidor.';
+
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "Cadastrar";
+        }
+      });
+    });
